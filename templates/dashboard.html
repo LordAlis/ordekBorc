@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ordekBorc{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Dashboard</h2>
+        <a href="{{ url_for('new_transaction') }}" class="btn btn-primary">New Transaction</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Sent Transactions</h5>
+            </div>
+            <div class="card-body">
+                {% if sent_transactions %}
+                    <div class="list-group">
+                        {% for transaction in sent_transactions %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">To: {{ transaction.receiver.username }}</h6>
+                                    <small>{{ transaction.created_at.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <p class="mb-1">Amount: ${{ "%.2f"|format(transaction.amount) }}</p>
+                                <p class="mb-1">Description: {{ transaction.description }}</p>
+                                <small class="text-muted">Status: {{ transaction.status }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No sent transactions</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Received Transactions</h5>
+            </div>
+            <div class="card-body">
+                {% if received_transactions %}
+                    <div class="list-group">
+                        {% for transaction in received_transactions %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">From: {{ transaction.sender.username }}</h6>
+                                    <small>{{ transaction.created_at.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <p class="mb-1">Amount: ${{ "%.2f"|format(transaction.amount) }}</p>
+                                <p class="mb-1">Description: {{ transaction.description }}</p>
+                                <small class="text-muted">Status: {{ transaction.status }}</small>
+                                {% if transaction.status == 'pending' %}
+                                    <div class="mt-2">
+                                        <a href="{{ url_for('handle_transaction', transaction_id=transaction.id, action='accept') }}" 
+                                           class="btn btn-success btn-sm">Accept</a>
+                                        <a href="{{ url_for('handle_transaction', transaction_id=transaction.id, action='reject') }}" 
+                                           class="btn btn-danger btn-sm">Reject</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No received transactions</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

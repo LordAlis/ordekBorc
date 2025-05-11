@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to ordekBorc{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 mb-4">Welcome to ordekBorc</h1>
+    <p class="lead mb-4">A simple way to manage money lending and borrowing between friends.</p>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Get Started</h5>
+                    <p class="card-text">Create an account to start managing your transactions with friends.</p>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary me-2">Register</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
