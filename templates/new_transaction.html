@@ -1,34 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}New Transaction - ordekBorc{% endblock %}
+{% block title %}Record New Lending - ordekBorc{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0">New Transaction</h4>
+                <h4 class="mb-0">Record New Lending</h4>
             </div>
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="receiver" class="form-label">Recipient Username</label>
-                        <input type="text" class="form-control" id="receiver" name="receiver" required>
+                        <label for="borrower_name" class="form-label">Borrower's Name</label>
+                        <input type="text" class="form-control" id="borrower_name" name="borrower_name" 
+                               placeholder="Enter the name of the person who borrowed money" required>
                     </div>
                     <div class="mb-3">
                         <label for="amount" class="form-label">Amount ($)</label>
-                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
+                        <input type="number" class="form-control" id="amount" name="amount" 
+                               step="0.01" min="0.01" required>
                     </div>
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        <label for="description" class="form-label">Description (optional)</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                 rows="3" placeholder="What was this lending for?"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send Request</button>
+                    <button type="submit" class="btn btn-primary">Record Lending</button>
                     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %} 

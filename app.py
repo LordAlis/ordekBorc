@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from models.user import db, User
 from models.transaction import Transaction
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -67,11 +68,11 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    sent_transactions = Transaction.query.filter_by(sender_id=current_user.id).all()
-    received_transactions = Transaction.query.filter_by(receiver_id=current_user.id).all()
+    transactions = Transaction.query.filter_by(user_id=current_user.id).all()
+    total_lent = sum(t.amount for t in transactions if not t.is_paid)
     return render_template('dashboard.html', 
-                         sent_transactions=sent_transactions,
-                         received_transactions=received_transactions)
+                         transactions=transactions,
+                         total_lent=total_lent)
 
 @app.route('/new_transaction', methods=['GET', 'POST'])
 @login_required
@@ -79,43 +80,35 @@ def new_transaction():
     if request.method == 'POST':
         amount = float(request.form.get('amount'))
         description = request.form.get('description')
-        receiver_username = request.form.get('receiver')
-        
-        receiver = User.query.filter_by(username=receiver_username).first()
-        if not receiver:
-            flash('User not found')
-            return redirect(url_for('new_transaction'))
+        borrower_name = request.form.get('borrower_name')
         
         transaction = Transaction(
             amount=amount,
             description=description,
-            sender_id=current_user.id,
-            receiver_id=receiver.id
+            borrower_name=borrower_name,
+            user_id=current_user.id
         )
         db.session.add(transaction)
         db.session.commit()
         
-        flash('Transaction request sent!')
+        flash('Transaction recorded successfully!')
         return redirect(url_for('dashboard'))
     
     return render_template('new_transaction.html')
 
-@app.route('/transaction/<int:transaction_id>/<action>')
+@app.route('/mark_as_paid/<int:transaction_id>')
 @login_required
-def handle_transaction(transaction_id, action):
+def mark_as_paid(transaction_id):
     transaction = Transaction.query.get_or_404(transaction_id)
     
-    if transaction.receiver_id != current_user.id:
+    if transaction.user_id != current_user.id:
         flash('Unauthorized action')
         return redirect(url_for('dashboard'))
     
-    if action == 'accept':
-        transaction.status = 'accepted'
-    elif action == 'reject':
-        transaction.status = 'rejected'
-    
+    transaction.is_paid = True
+    transaction.paid_at = datetime.utcnow()
     db.session.commit()
-    flash(f'Transaction {action}ed!')
+    flash('Transaction marked as paid!')
     return redirect(url_for('dashboard'))
 
 @app.route('/logout')
